@@ -56,8 +56,8 @@ public class TestSetUp {
 		
 	}
     @BeforeMethod
-    public void openBrowser( Method method) throws IOException {
-    	test=extent.createTest(method.getName());
+    public void openBrowser() throws IOException {
+    	test=extent.createTest("test");
     	driver=openApplication(getProperties("browser"));
     }
     
