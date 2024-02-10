@@ -9,6 +9,7 @@ import java.util.Set;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -68,7 +69,7 @@ public class TechnicalComponents extends TestSetUp {
 			Date d= new Date();
 			String screenshotName=d.getDate()+" "+d.getMonth()+"_"+d.getYear()+"_"+d.getHours()+"_"+d.getSeconds();
 			filepath=System.getProperty("user.dir")+"/reports/screenshot/"+screenshotName+".jpg";
-			Files.move(f, new File(filepath));
+			Files.copy(f, new File(filepath));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
