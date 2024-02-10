@@ -38,10 +38,9 @@ public class TestSetUp {
 	 public ExtentReports extent;
 	 public ExtentTest test;
 	 ITestResult Result;
-	 public static ThreadLocal<WebDriver> threadLocalVariable = new ThreadLocal<>();
+//	 public static ThreadLocal<WebDriver> threadLocalVariable = new ThreadLocal<>();
     @BeforeSuite
 	public void Suite() {
-    	
     	Date d= new Date();
     String reportName="localRun"+d.getDate()+" "+d.getMonth()+"_"+d.getYear()+"_"+d.getHours()+"_"+d.getSeconds();
     	htmlreporter= new ExtentHtmlReporter(System.getProperty("user.dir")+"/reports/"+reportName+".html");
@@ -114,9 +113,9 @@ public class TestSetUp {
     	}
     	return driver;
     }
-    public static  WebDriver getDriver() {
-    	WebDriver localdriver;
-    	localdriver=driver;
-    	return localdriver;
-    }
+//    public static  WebDriver getDriver() {
+//    	WebDriver localdriver;
+//    	localdriver=driver;
+//    	return localdriver;
+//    }
 }

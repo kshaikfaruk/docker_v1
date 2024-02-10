@@ -21,7 +21,6 @@ import config.TestSetUp;
 public class TechnicalComponents extends TestSetUp {
 	public static WebDriverWait wait;
 	public static void navigateTOUrl(String url) {
-		driver=getDriver();
 		driver.get(url);
 	}
 	public  static void type(String text,WebElement element) {
