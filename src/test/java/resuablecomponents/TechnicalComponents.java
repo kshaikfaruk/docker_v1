@@ -5,19 +5,20 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
-
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.google.common.io.Files;
-
 import config.TestSetUp;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import junit.framework.Assert;
+import responseValidation.CreateUserresponse;
 
 public class TechnicalComponents extends TestSetUp {
 	public static WebDriverWait wait;
@@ -69,7 +70,6 @@ public class TechnicalComponents extends TestSetUp {
 			Date d= new Date();
 			String screenshotName=d.getDate()+" "+d.getMonth()+"_"+d.getYear()+"_"+d.getHours()+"_"+d.getSeconds();
 			filepath=System.getProperty("user.dir")+"/reports/screenshot/"+screenshotName+".jpg";
-			Files.copy(f, new File(filepath));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -84,9 +84,6 @@ public class TechnicalComponents extends TestSetUp {
 	    String text=element.getText();
 	     return text;
 		}
-	
 }
-
-
 
 

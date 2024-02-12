@@ -8,6 +8,7 @@ import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 
 import or.Homepage;
+import responseValidation.CreateUserresponse;
 
 public class BussinessComponents extends TechnicalComponents {
     public Homepage hs;
@@ -37,6 +38,18 @@ public class BussinessComponents extends TechnicalComponents {
 	test.log(Status.PASS,"Click on the search button",MediaEntityBuilder.createScreenCaptureFromPath(TechnicalComponents.takescreenshot())
 			.build() );
 	}
+	
+	 public void verifythe_givenapi(String baseurl,String playload,String pathparam,String method,String endpotinturl,String element) {
+		 test.log(Status.PASS, "given required details");
+		 givenPayload( baseurl,playload,pathparam);
+		 test.log(Status.PASS, "htting api request");
+	    resp= hiturl(method,endpotinturl);
+	    test.log(Status.PASS, "verifiying api response");
+	    CreateUserresponse s= Verifythe_response(resp,element);
+	    test.log(Status.PASS, "id :"+s.getId());
+	    test.log(Status.PASS, "created AT"+s.getCreatedAt());
+	    
+	 }
 	
 }
 

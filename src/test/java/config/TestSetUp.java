@@ -3,6 +3,9 @@ package config;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -13,6 +16,8 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -27,7 +32,13 @@ import com.aventstack.extentreports.markuputils.MarkupHelper;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 
+import io.appium.java_client.remote.MobileCapabilityType;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+import junit.framework.Assert;
+import responseValidation.CreateUserresponse;
 
 public class TestSetUp {
 	public static WebDriver driver;
@@ -38,8 +49,10 @@ public class TestSetUp {
 	 public ExtentReports extent;
 	 public ExtentTest test;
 	 ITestResult Result;
+	 DesiredCapabilities ds;
+	 public static RequestSpecification rs;
+		public static Response resp;
  public static ThreadLocal<WebDriver> threadLocalVariable = new ThreadLocal<>();
- public static ThreadLocal<ExtentTest> testReport = new ThreadLocal<ExtentTest>();
     @BeforeSuite
 	public void Suite() {
     	Date d= new Date();
@@ -51,10 +64,11 @@ public class TestSetUp {
 		htmlreporter.config().setReportName("Automation test results");
 		extent=new ExtentReports();
 		extent.attachReporter(htmlreporter);
-		test=extent.createTest("test");	
+		test=extent.createTest("test");
+		
 	}
     @BeforeMethod
-    public void openBrowser() throws IOException {
+    public void openBrowser(Method method) throws IOException {		
     	driver=openApplication(getProperties("browser"));
     }
     
@@ -65,17 +79,17 @@ public class TestSetUp {
     		String excepionMessage=Arrays.toString(results.getThrowable().getStackTrace());
     		String logtext="<b> + Testcase-failed</b>"+results.getMethod()+"<details>message:"+excepionMessage+"</details></b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.RED);
-    		testReport.get().fail(m);
+    		test.fail(m);
     	}else if(results.getStatus()==ITestResult.SUCCESS) {
     		String methodName=results.getMethod().getMethodName();
     		String logtext="<b> + Testcase-Passed</b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.GREEN);
-    		testReport.get().pass(m);
+    		test.pass(m);
     	}else if(results.getStatus()==ITestResult.SKIP) {
     		String methodName=results.getMethod().getMethodName();
     		String logtext="<b> + Testcase-skipped</b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.GREY);
-    		testReport.get().skip(m);
+    		test.skip(m);
     	}
     	
     }
@@ -97,7 +111,7 @@ public class TestSetUp {
     	return s1;
     }
     
-    public WebDriver openApplication(String s2) {
+    public WebDriver openApplication(String s2) throws MalformedURLException {
     	switch(s2) {
     	case "chrome":
     		System.setProperty("webdriver.chrome.driver", System.getProperty("user.dir")+"/driver/chromedriver.exe"); 
@@ -110,9 +124,45 @@ public class TestSetUp {
     		WebDriverManager.firefoxdriver().setup();
         	driver=new FirefoxDriver();
         	break; 	
-        	
+    	case "andorid":
+    		ds= new DesiredCapabilities();
+    		 ds.setCapability(MobileCapabilityType.PLATFORM_NAME,"Android");
+    		 ds.setCapability(MobileCapabilityType.AUTOMATION_NAME,"UIAutomator2");
+    		 ds.setCapability(MobileCapabilityType.DEVICE_NAME,"emulator-5554");
+    		 ds.setCapability(MobileCapabilityType.APP, "E:\\mobiletesting\\Mobile_testing_v1\\app\\General-Store.apk");
+    		 ds.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
+    		 driver= new RemoteWebDriver(new URL("https://0.0.0.0:4723/wd/hub"),ds);
+    	    break;
+    	case "api": 
+    		System.out.println("api test");
+    		break;
+    	default:
+    		System.out.println("browser not found");
     	}
     	return driver;
     }
+	 public  static void givenPayload(String baseurl,String playload, String pathparam ) {
+		  rs= RestAssured.given().header("contentType","application/json").header("pathParam", pathparam).baseUri(baseurl).body(playload);    
+			}
+	 
+	 public  static Response hiturl(String method,String endpotinturl) {
+		    if(method.equals("get")) {
+		    	 resp =rs.when().get(endpotinturl).then().extract().response();
+		    	 
+			}else if(method.equals("post")) {
+				resp =rs.when().post(endpotinturl).then().extract().response();
+			}
+		    return resp;
+}
+	 public static  CreateUserresponse Verifythe_response(Response respo, String element) {
+		   Assert.assertEquals(respo.statusCode(), 201);
+		   CreateUserresponse s=respo.as(CreateUserresponse.class);
+//		   JsonPath js= new JsonPath(s);
+//		  String s1= js.get(element);
+//		  int i=Integer.parseInt(s1);
+//		  Assert.assertEquals(i, 230);
+//		  
+return s;
+}
     
 }
