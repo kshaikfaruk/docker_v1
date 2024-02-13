@@ -8,7 +8,7 @@ import org.testng.annotations.Test;
 import resuablecomponents.BussinessComponents;
 
 public class VerifyNavigateapplication extends BussinessComponents	 {
-    @Test
+    @Test(priority=1)
 	public void navigateapplication() throws IOException {
 		navigate_to_Application(getProperties("url"));
 		entervaluein_inputField("hello");

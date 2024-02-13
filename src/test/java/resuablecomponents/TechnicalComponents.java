@@ -5,35 +5,35 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Set;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import config.DriverFactory;
 import config.TestSetUp;
-import io.restassured.RestAssured;
-import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
-import junit.framework.Assert;
-import responseValidation.CreateUserresponse;
 
 public class TechnicalComponents extends TestSetUp {
 	public static WebDriverWait wait;
+   public static WebDriver localdriver;
 	public static void navigateTOUrl(String url) {
-		driver.get(url);
+		localdriver= DriverFactory.getInstance().getDriver();
+		localdriver.get(url);
 	}
 	public  static void type(String text,WebElement element) {
 		 highlightElement( element);
 	   element.sendKeys(text);
 	}
 	public  static void waitforWaitElement(int timeout) {
-		  driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(timeout));
+		localdriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(timeout));
 		}
 	public  static void waitforWebElementtoload(Duration timeout,WebElement element) {
-		  wait= new WebDriverWait(driver, timeout);
+		  wait= new WebDriverWait(localdriver, timeout);
 		  wait.until(ExpectedConditions.visibilityOf(element));
 		}
 	public  static void click(WebElement element) {
@@ -46,18 +46,18 @@ public class TechnicalComponents extends TestSetUp {
 		  
 		}
 	public  static void switchIframe(WebElement element) {
-		  driver.switchTo().frame(element);
+		localdriver.switchTo().frame(element);
 		  
 		}
 	public  static void switchtoWindow(WebElement element) {
-		  Set<String>session=driver.getWindowHandles();
+		  Set<String>session=localdriver.getWindowHandles();
 		  Iterator<String> i=session.iterator();
-		  String firstSession=driver.getWindowHandle();
+		  String firstSession=localdriver.getWindowHandle();
 		  String secondwindow;
 		  while(i.hasNext()) {
 			  secondwindow=i.next();
 		  if(i.next()!=firstSession) {
-			  driver.switchTo().window(secondwindow);
+			  localdriver.switchTo().window(secondwindow);
 			  break;
 		  }
 		}
@@ -65,7 +65,7 @@ public class TechnicalComponents extends TestSetUp {
 	public static String takescreenshot() {
 		String filepath="";
 		try {
-			ts=(TakesScreenshot)driver;
+			ts=(TakesScreenshot) localdriver;
 			File f=ts.getScreenshotAs(OutputType.FILE);
 			Date d= new Date();
 			String screenshotName=d.getDate()+" "+d.getMonth()+"_"+d.getYear()+"_"+d.getHours()+"_"+d.getSeconds();
@@ -77,7 +77,7 @@ public class TechnicalComponents extends TestSetUp {
 		return filepath;
 	}
 	 public static void highlightElement(WebElement element) {
-		 js=(JavascriptExecutor)driver;
+		 js=(JavascriptExecutor)localdriver;
 			js.executeScript("arguments[0].style.border='red 2px solid';", element);
 	 }
 	 public  static String gettext(WebElement element) {

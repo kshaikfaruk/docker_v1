@@ -32,11 +32,11 @@ public Homepage(WebDriver driver){
 	 TechnicalComponents.click(element);
  }
  
- public void verifyResultsText(WebElement element) {
+ public void verifyResultsText(WebElement element,String search_text) {
 	TechnicalComponents.waitforWebElementtoload(Duration.ofSeconds(20), element);
 	String text= TechnicalComponents.gettext(element);
 	String s1=text.split(" ")[1];
-	Assert.assertEquals("Search",s1);
+	Assert.assertEquals(search_text,s1);
  }
 
 }

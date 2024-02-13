@@ -26,9 +26,11 @@ import org.testng.annotations.BeforeSuite;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.Markup;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
+import com.aventstack.extentreports.model.Media;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 
@@ -52,23 +54,24 @@ public class TestSetUp {
 	 DesiredCapabilities ds;
 	 public static RequestSpecification rs;
 		public static Response resp;
- public static ThreadLocal<WebDriver> threadLocalVariable = new ThreadLocal<>();
+ public static  ThreadLocal<WebDriver> threadLocalVariable = new ThreadLocal<>();
     @BeforeSuite
 	public void Suite() {
     	Date d= new Date();
      String reportName="localRun"+d.getDate()+" "+d.getMonth()+"_"+d.getYear()+"_"+d.getHours()+"_"+d.getSeconds();
      htmlreporter = new ExtentSparkReporter(System.getProperty("user.dir")+"/reports/"+reportName+".html");
-//    	htmlreporter= new ExtentReporter(System.getProperty("user.dir")+"/reports/"+reportName+".html");
+    	//htmlreporter= new ExtentReporter(System.getProperty("user.dir")+"/reports/"+reportName+".html");
 		htmlreporter.config().setEncoding("utf-8");
 		htmlreporter.config().setTheme(Theme.STANDARD);
 		htmlreporter.config().setReportName("Automation test results");
 		extent=new ExtentReports();
 		extent.attachReporter(htmlreporter);
-		test=extent.createTest("test");
 		
 	}
     @BeforeMethod
-    public void openBrowser(Method method) throws IOException {		
+    public void openBrowser(Method method) throws IOException {	
+    	  test=  extent.createTest(method.getName());
+  	    ExtentFactory.getInstance().setExtent(test);
     	driver=openApplication(getProperties("browser"));
     }
     
@@ -79,17 +82,20 @@ public class TestSetUp {
     		String excepionMessage=Arrays.toString(results.getThrowable().getStackTrace());
     		String logtext="<b> + Testcase-failed</b>"+results.getMethod()+"<details>message:"+excepionMessage+"</details></b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.RED);
-    		test.fail(m);
+    		ExtentFactory.getInstance().getExtent().fail(m);
     	}else if(results.getStatus()==ITestResult.SUCCESS) {
     		String methodName=results.getMethod().getMethodName();
     		String logtext="<b> + Testcase-Passed</b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.GREEN);
-    		test.pass(m);
+    		ExtentFactory.getInstance().getExtent().pass(m);                  
     	}else if(results.getStatus()==ITestResult.SKIP) {
     		String methodName=results.getMethod().getMethodName();
     		String logtext="<b> + Testcase-skipped</b>";
     		Markup m=MarkupHelper.createLabel(logtext, ExtentColor.GREY);
-    		test.skip(m);
+    		ExtentFactory.getInstance().getExtent().skip(m);
+    	}
+    	if( DriverFactory.getInstance().getDriver()!=null) {
+    		DriverFactory.getInstance().closeBrowser();
     	}
     	
     }
@@ -97,9 +103,7 @@ public class TestSetUp {
     @AfterSuite
     public void closeApplication() {
     	extent.flush();
-    	if(driver!=null) {
-    		driver.quit();
-    	}
+    
     }
    
     public String getProperties(String s) throws IOException {
@@ -118,7 +122,8 @@ public class TestSetUp {
     		ChromeOptions co = new ChromeOptions();
             co.addArguments("--remote-allow-origins=*");
             co.addArguments("--disable-dev-shm-usage");
-    		driver=new ChromeDriver(co);
+            driver=new ChromeDriver(co);
+            DriverFactory.getInstance().setDriver(driver);
         	break;
     	case "firefox":
     		WebDriverManager.firefoxdriver().setup();
@@ -139,7 +144,7 @@ public class TestSetUp {
     	default:
     		System.out.println("browser not found");
     	}
-    	return driver;
+    	return DriverFactory.getInstance().getDriver();
     }
 	 public  static void givenPayload(String baseurl,String playload, String pathparam ) {
 		  rs= RestAssured.given().header("contentType","application/json").header("pathParam", pathparam).baseUri(baseurl).body(playload);    
@@ -164,5 +169,7 @@ public class TestSetUp {
 //		  
 return s;
 }
+
+
     
 }
