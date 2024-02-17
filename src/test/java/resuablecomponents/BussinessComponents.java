@@ -2,15 +2,13 @@ package resuablecomponents;
 
 import java.io.IOException;
 
-import org.openqa.selenium.WebElement;
-
-import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.MediaEntityBuilder;
 import com.aventstack.extentreports.Status;
 
 import config.ExtentFactory;
 import or.Homepage;
 import responseValidation.CreateUserresponse;
+import responseValidation.ResponseVale;
 
 public class BussinessComponents extends TechnicalComponents {
     public Homepage hs;
@@ -42,15 +40,33 @@ public class BussinessComponents extends TechnicalComponents {
 			.build() );
 	}
 	
-	 public void verifythe_givenapi(String baseurl,String playload,String pathparam,String method,String endpotinturl,String element) {
+	 public void verifythe_givenapi(String baseurl,String playload,String pathparam,String method,String endpotinturl,String element, int statuscode) {
 		 ExtentFactory.getInstance().getExtent().log(Status.PASS, "given required details");
 		 givenPayload( baseurl,playload,pathparam);
 		 ExtentFactory.getInstance().getExtent().log(Status.PASS, "htting api request");
 	    resp= hiturl(method,endpotinturl);
 	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "verifiying api response");
-	    CreateUserresponse s= Verifythe_response(resp,element);
+	    CreateUserresponse s= Verifythe_response(resp,element,statuscode);
 	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "id :"+s.getId());
 	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "created AT"+s.getCreatedAt());
+	    
+	 }
+	 
+	 public void verifythe_givenapiresponse(String baseurl,String playload,String pathparam,String method,String endpotinturl,String element, int statuscode) {
+		 ExtentFactory.getInstance().getExtent().log(Status.PASS, "given required details");
+		 givenPayload( baseurl,playload,pathparam);
+		 ExtentFactory.getInstance().getExtent().log(Status.PASS, "htting api request");
+	    resp= hiturl(method,endpotinturl);
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "verifiying api response");
+	    ResponseVale s= Verifyapiresonse(resp,element,statuscode);
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "id :"+s.getPage());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "created AT"+s.getPer_page());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "firstName"+s.getData().get(1).getFirst_name());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "lastName"+s.getData().get(1).getLast_name());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "email"+s.getData().get(1).getEmail());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "url"+s.getSupport().getUrl());
+	    ExtentFactory.getInstance().getExtent().log(Status.PASS, "url"+s.getSupport().getText());
+	    
 	    
 	 }
 	

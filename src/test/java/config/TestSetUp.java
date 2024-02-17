@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Properties;
@@ -26,21 +27,21 @@ import org.testng.annotations.BeforeSuite;
 
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
-import com.aventstack.extentreports.Status;
 import com.aventstack.extentreports.markuputils.ExtentColor;
 import com.aventstack.extentreports.markuputils.Markup;
 import com.aventstack.extentreports.markuputils.MarkupHelper;
-import com.aventstack.extentreports.model.Media;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 import com.aventstack.extentreports.reporter.configuration.Theme;
 
-import io.appium.java_client.remote.MobileCapabilityType;
+import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.android.options.UiAutomator2Options;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import junit.framework.Assert;
 import responseValidation.CreateUserresponse;
+import responseValidation.ResponseVale;
 
 public class TestSetUp {
 	public static WebDriver driver;
@@ -97,12 +98,13 @@ public class TestSetUp {
     	if( DriverFactory.getInstance().getDriver()!=null) {
     		DriverFactory.getInstance().closeBrowser();
     	}
+    	extent.flush();
     	
     }
     
     @AfterSuite
     public void closeApplication() {
-    	extent.flush();
+    
     
     }
    
@@ -130,13 +132,12 @@ public class TestSetUp {
         	driver=new FirefoxDriver();
         	break; 	
     	case "andorid":
-    		ds= new DesiredCapabilities();
-    		 ds.setCapability(MobileCapabilityType.PLATFORM_NAME,"Android");
-    		 ds.setCapability(MobileCapabilityType.AUTOMATION_NAME,"UIAutomator2");
-    		 ds.setCapability(MobileCapabilityType.DEVICE_NAME,"emulator-5554");
-    		 ds.setCapability(MobileCapabilityType.APP, "E:\\mobiletesting\\Mobile_testing_v1\\app\\General-Store.apk");
-    		 ds.setCapability(MobileCapabilityType.NEW_COMMAND_TIMEOUT, 300);
-    		 driver= new RemoteWebDriver(new URL("https://0.0.0.0:4723/wd/hub"),ds);
+    		UiAutomator2Options options = new UiAutomator2Options();
+    		options.setDeviceName("emulator-5554");
+    		options.setApp("E:\\mobiletestingandAPIPractice\\learning_mobiletesting_v1\\app\\General-Store.apk");	
+//    		options.setCapability("automationName","UIAutomator2");
+            driver=(AndroidDriver) new RemoteWebDriver(new URL("http://127.0.0.1:4723"),options);
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     	    break;
     	case "api": 
     		System.out.println("api test");
@@ -159,8 +160,8 @@ public class TestSetUp {
 			}
 		    return resp;
 }
-	 public static  CreateUserresponse Verifythe_response(Response respo, String element) {
-		   Assert.assertEquals(respo.statusCode(), 201);
+	 public static  CreateUserresponse Verifythe_response(Response respo, String element,int status) {
+		   Assert.assertEquals(respo.statusCode(), status);
 		   CreateUserresponse s=respo.as(CreateUserresponse.class);
 //		   JsonPath js= new JsonPath(s);
 //		  String s1= js.get(element);
@@ -170,6 +171,15 @@ public class TestSetUp {
 return s;
 }
 
-
+	 public static  ResponseVale Verifyapiresonse(Response respo, String element,int status) {
+		   Assert.assertEquals(respo.statusCode(), status);
+		   ResponseVale s=respo.as(ResponseVale.class);
+//		   JsonPath js= new JsonPath(s);
+//		  String s1= js.get(element);
+//		  int i=Integer.parseInt(s1);
+//		  Assert.assertEquals(i, 230);
+//		  
+return s;
+}
     
 }

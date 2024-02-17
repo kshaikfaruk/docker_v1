@@ -11,8 +11,8 @@ public class Verifythegivenapi extends BussinessComponents {
 	 		+ "    \"name\": \"morpheus\",\r\n"
 	 		+ "    \"job\": \"leader\"\r\n"
 	 		+ "}";
-    	verifythe_givenapi("https://reqres.in/api",s,"","post","/users","id");
+    	verifythe_givenapi("https://reqres.in/api",s,"","post","/users","id", 201);
     	
-    	verifythe_givenapi("https://reqres.in/api","","2","get","/users","id");
+    	verifythe_givenapiresponse("https://reqres.in/api","","2","get","/users","id",200);
 	}
 }
